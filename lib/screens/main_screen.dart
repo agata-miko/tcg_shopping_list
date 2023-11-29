@@ -10,24 +10,16 @@ class MainScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Your Groceries'),
       ),
-      body: Column(
-        children: <Widget>[
-          ListTile(
-            title: Text(groceryItems[0].name),
-            leading: Icon(Icons.square, color: groceryItems[0].category.color,),
-            trailing: Text((groceryItems[0].quantity).toString()),
+      body: ListView.builder(
+        itemCount: groceryItems.length,
+        itemBuilder: (context, index) => ListTile(
+          title: Text(groceryItems[index].name),
+          leading: Icon(
+            Icons.square,
+            color: groceryItems[index].category.color,
           ),
-          ListTile(
-            title: Text(groceryItems[1].name),
-            leading: Icon(Icons.square, color: groceryItems[1].category.color,),
-            trailing: Text((groceryItems[1].quantity).toString()),
-          ),
-          ListTile(
-            title: Text(groceryItems[2].name),
-            leading: Icon(Icons.square, color: groceryItems[2].category.color,),
-            trailing: Text((groceryItems[2].quantity).toString()),
-          ),
-        ],
+          trailing: Text((groceryItems[index].quantity).toString()),
+        ),
       ),
     );
   }
