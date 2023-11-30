@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:tcg_shopping_list/data/categories.dart';
 import 'package:tcg_shopping_list/models/category.dart';
-import 'package:tcg_shopping_list/models/grocery_item.dart';
+// import 'package:tcg_shopping_list/models/grocery_item.dart';
 
 class NewItemScreen extends StatefulWidget {
   const NewItemScreen({Key? key}) : super(key: key);
@@ -19,11 +21,28 @@ class _NewItemScreenState extends State<NewItemScreen> {
   void _saveItem() {
     _formKey.currentState!.validate();
     _formKey.currentState!.save();
-    Navigator.of(context).pop(GroceryItem(
-        id: DateTime.now().toString(),
-        name: _enteredName,
-        quantity: _enteredQuantity,
-        category: _selectedCategory));
+    final url = Uri.https(
+        'flutter-tcg-shopping-list-default-rtdb.firebaseio.com',
+        'shopping-list.json');
+    http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(
+        {
+          'name': _enteredName,
+          'quantity': _enteredQuantity,
+          'category': _selectedCategory.name,
+        },
+      ),
+    );
+
+    // Navigator.of(context).pop(GroceryItem(
+    //     id: DateTime.now().toString(),
+    //     name: _enteredName,
+    //     quantity: _enteredQuantity,
+    //     category: _selectedCategory));
   }
 
   @override
