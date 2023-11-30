@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tcg_shopping_list/data/categories.dart';
+import 'package:tcg_shopping_list/models/category.dart';
 
 class NewItemScreen extends StatefulWidget {
   const NewItemScreen({Key? key}) : super(key: key);
@@ -10,9 +11,15 @@ class NewItemScreen extends StatefulWidget {
 
 class _NewItemScreenState extends State<NewItemScreen> {
   final _formKey = GlobalKey<FormState>();
+  var _enteredName = '';
+  var _enteredQuantity = 1;
+  var _selectedCategory = categories[Categories.vegetables]!;
 
   void _saveItem() {
     _formKey.currentState!.validate();
+    _formKey.currentState!.save();
+    print(_enteredName);
+    print(_enteredQuantity);
   }
 
   @override
@@ -39,51 +46,61 @@ class _NewItemScreenState extends State<NewItemScreen> {
                   }
                   return null;
                 },
+                onSaved: (newValue) => _enteredName = newValue!,
               ),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Expanded(
                     child: TextFormField(
-                      decoration: const InputDecoration(
-                        label: Text('Quantity'),
-                      ),
-                      keyboardType: TextInputType.number,
-                      initialValue: '1',
-                      validator: (value) {
-                        if (value == null ||
-                            value.isEmpty ||
-                            int.tryParse(value) == null ||
-                            int.tryParse(value)! <= 0) {
-                          return 'Must be a valid, positive number';
-                        }
-                        return null;
-                      },
-                    ),
+                        decoration: const InputDecoration(
+                          label: Text('Quantity'),
+                        ),
+                        keyboardType: TextInputType.number,
+                        initialValue: _enteredQuantity.toString(),
+                        validator: (value) {
+                          if (value == null ||
+                              value.isEmpty ||
+                              int.tryParse(value) == null ||
+                              int.tryParse(value)! <= 0) {
+                            return 'Must be a valid, positive number';
+                          }
+                          return null;
+                        },
+                        onSaved: (newValue) {
+                          _enteredQuantity = int.parse(newValue!);
+                        }),
                   ),
                   const SizedBox(
                     width: 8,
                   ),
                   Expanded(
-                    child: DropdownButtonFormField(items: [
-                      for (final category in categories.entries)
-                        DropdownMenuItem(
-                          value: category.value,
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 16,
-                                height: 16,
-                                color: category.value.color,
+                    child: DropdownButtonFormField(
+                        value: _selectedCategory,
+                        items: [
+                          for (final category in categories.entries)
+                            DropdownMenuItem(
+                              value: category.value,
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 16,
+                                    height: 16,
+                                    color: category.value.color,
+                                  ),
+                                  const SizedBox(
+                                    width: 6,
+                                  ),
+                                  Text(category.value.name),
+                                ],
                               ),
-                              const SizedBox(
-                                width: 6,
-                              ),
-                              Text(category.value.name),
-                            ],
-                          ),
-                        ),
-                    ], onChanged: (value) {}),
+                            )
+                        ],
+                        onChanged: (value) {
+                          setState(() {
+                            _selectedCategory = value!;
+                          });
+                        }),
                   ),
                 ],
               ),
