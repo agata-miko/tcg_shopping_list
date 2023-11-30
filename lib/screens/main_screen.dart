@@ -27,6 +27,12 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
+  void _removeItem(GroceryItem item) {
+    setState(() {
+      _groceryItems.remove(item);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +54,7 @@ class _MainScreenState extends State<MainScreen> {
         Dismissible(
           key: ValueKey(_groceryItems[index].id),
           background: Container(color: Colors.red.withOpacity(0.2),),
-          onDismissed: (direction) {_groceryItems.removeAt(index);},
+          onDismissed: (direction) {_removeItem(_groceryItems[index]);},
           child: ListTile(
             title: Text(_groceryItems[index].name),
             leading: Icon(
