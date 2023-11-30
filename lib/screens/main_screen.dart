@@ -30,26 +30,37 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Your Groceries'),
-        actions: [
-          IconButton(
-            onPressed: _addItem,
-            icon: const Icon(Icons.add),
-          ),
-        ],
-      ),
-      body: ListView.builder(
-        itemCount: _groceryItems.length,
-        itemBuilder: (context, index) => ListTile(
-          title: Text(_groceryItems[index].name),
-          leading: Icon(
-            Icons.square,
-            color: _groceryItems[index].category.color,
-          ),
-          trailing: Text((_groceryItems[index].quantity).toString()),
+        appBar: AppBar(
+          title: const Text('Your Groceries'),
+          actions: [
+            IconButton(
+              onPressed: _addItem,
+              icon: const Icon(Icons.add),
+            ),
+          ],
         ),
-      ),
+        body: _groceryItems.isEmpty
+            ? const Center(child: Text('No items yet'))
+            : ListView.builder(
+    itemCount: _groceryItems.length,
+        itemBuilder: (context, index)
+    =>
+        Dismissible(
+          key: ValueKey(_groceryItems[index].id),
+          background: Container(color: Colors.red.withOpacity(0.2),),
+          onDismissed: (direction) {_groceryItems.removeAt(index);},
+          child: ListTile(
+            title: Text(_groceryItems[index].name),
+            leading: Icon(
+              Icons.square,
+              color: _groceryItems[index].category.color,
+            ),
+            trailing: Text((_groceryItems[index].quantity).toString()),
+          ),
+        )
+    ,
+    )
+    ,
     );
   }
 }
