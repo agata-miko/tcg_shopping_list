@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:tcg_shopping_list/data/categories.dart';
 import 'package:tcg_shopping_list/models/category.dart';
+import 'package:tcg_shopping_list/models/grocery_item.dart';
 // import 'package:tcg_shopping_list/models/grocery_item.dart';
 
 class NewItemScreen extends StatefulWidget {
@@ -38,15 +39,18 @@ class _NewItemScreenState extends State<NewItemScreen> {
       ),
     );
 
-    print(response.body);
-    print(response.statusCode);
+    final Map<String, dynamic> resData = json.decode(response.body);
 
     if (!context.mounted) {
       return;
     }
-    Navigator.of(context).pop();
-
-
+    Navigator.of(context).pop(
+      GroceryItem(
+          id: resData['name'],
+          name: _enteredName,
+          quantity: _enteredQuantity,
+          category: _selectedCategory),
+    );
 
     // Navigator.of(context).pop(GroceryItem(
     //     id: DateTime.now().toString(),
