@@ -25,7 +25,9 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _loadItems() async {
-    final url = Uri.https('flutter-tcg-shopping-list-default-rtdb.firebaseio.com', 'shopping-list.json');
+    final url = Uri.https(
+        'flutter-tcg-shopping-list-default-rtdb.firebaseio.com',
+        'shopping-list.json');
     final response = await http.get(url);
     if (response.statusCode >= 400) {
       setState(() {
@@ -70,10 +72,23 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
 
-  void _removeItem(GroceryItem item) {
+  void _removeItem(GroceryItem item) async {
+    final index = _groceryItems.indexOf(item);
     setState(() {
       _groceryItems.remove(item);
     });
+
+    final url = Uri.https(
+        'flutter-tcg-shopping-list-default-rtdb.firebaseio.com',
+        'shopping-list/${item.id}.json');
+
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      setState(() {
+        _groceryItems.insert(index, item);
+      });
+    }
   }
 
   @override
@@ -91,30 +106,31 @@ class _MainScreenState extends State<MainScreen> {
       body: _error != null
           ? Center(child: Text(_error!))
           : _isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : _groceryItems.isEmpty
-                  ? const Center(child: Text('No items yet'))
-                  : ListView.builder(
-                      itemCount: _groceryItems.length,
-                      itemBuilder: (context, index) => Dismissible(
-                        key: ValueKey(_groceryItems[index].id),
-                        background: Container(
-                          color: Colors.red.withOpacity(0.2),
-                        ),
-                        onDismissed: (direction) {
-                          _removeItem(_groceryItems[index]);
-                        },
-                        child: ListTile(
-                          title: Text(_groceryItems[index].name),
-                          leading: Icon(
-                            Icons.square,
-                            color: _groceryItems[index].category.color,
-                          ),
-                          trailing:
-                              Text((_groceryItems[index].quantity).toString()),
-                        ),
-                      ),
-                    ),
+          ? const Center(child: CircularProgressIndicator())
+          : _groceryItems.isEmpty
+          ? const Center(child: Text('No items yet'))
+          : ListView.builder(
+        itemCount: _groceryItems.length,
+        itemBuilder: (context, index) =>
+            Dismissible(
+              key: ValueKey(_groceryItems[index].id),
+              background: Container(
+                color: Colors.red.withOpacity(0.2),
+              ),
+              onDismissed: (direction) {
+                _removeItem(_groceryItems[index]);
+              },
+              child: ListTile(
+                title: Text(_groceryItems[index].name),
+                leading: Icon(
+                  Icons.square,
+                  color: _groceryItems[index].category.color,
+                ),
+                trailing:
+                Text((_groceryItems[index].quantity).toString()),
+              ),
+            ),
+      ),
     );
   }
 }
