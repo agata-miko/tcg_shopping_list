@@ -15,6 +15,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   List<GroceryItem> _groceryItems = [];
+  var _isLoading = true;
 
   @override
   void initState() {
@@ -27,8 +28,7 @@ class _MainScreenState extends State<MainScreen> {
         'flutter-tcg-shopping-list-default-rtdb.firebaseio.com',
         'shopping-list.json');
     final response = await http.get(url);
-    final Map<String, dynamic> listData =
-        json.decode(response.body);
+    final Map<String, dynamic> listData = json.decode(response.body);
     final List<GroceryItem> loadedItems = [];
     for (final item in listData.entries) {
       final category = categories.entries
@@ -45,6 +45,7 @@ class _MainScreenState extends State<MainScreen> {
     }
     setState(() {
       _groceryItems = loadedItems;
+      _isLoading = false;
     });
   }
 
@@ -82,28 +83,31 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: _groceryItems.isEmpty
-          ? const Center(child: Text('No items yet'))
-          : ListView.builder(
-              itemCount: _groceryItems.length,
-              itemBuilder: (context, index) => Dismissible(
-                key: ValueKey(_groceryItems[index].id),
-                background: Container(
-                  color: Colors.red.withOpacity(0.2),
-                ),
-                onDismissed: (direction) {
-                  _removeItem(_groceryItems[index]);
-                },
-                child: ListTile(
-                  title: Text(_groceryItems[index].name),
-                  leading: Icon(
-                    Icons.square,
-                    color: _groceryItems[index].category.color,
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _groceryItems.isEmpty
+              ? const Center(child: Text('No items yet'))
+              : ListView.builder(
+                  itemCount: _groceryItems.length,
+                  itemBuilder: (context, index) => Dismissible(
+                    key: ValueKey(_groceryItems[index].id),
+                    background: Container(
+                      color: Colors.red.withOpacity(0.2),
+                    ),
+                    onDismissed: (direction) {
+                      _removeItem(_groceryItems[index]);
+                    },
+                    child: ListTile(
+                      title: Text(_groceryItems[index].name),
+                      leading: Icon(
+                        Icons.square,
+                        color: _groceryItems[index].category.color,
+                      ),
+                      trailing:
+                          Text((_groceryItems[index].quantity).toString()),
+                    ),
                   ),
-                  trailing: Text((_groceryItems[index].quantity).toString()),
                 ),
-              ),
-            ),
     );
   }
 }

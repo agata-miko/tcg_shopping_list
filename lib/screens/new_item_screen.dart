@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:tcg_shopping_list/data/categories.dart';
 import 'package:tcg_shopping_list/models/category.dart';
 import 'package:tcg_shopping_list/models/grocery_item.dart';
-// import 'package:tcg_shopping_list/models/grocery_item.dart';
 
 class NewItemScreen extends StatefulWidget {
   const NewItemScreen({Key? key}) : super(key: key);
@@ -18,10 +17,14 @@ class _NewItemScreenState extends State<NewItemScreen> {
   var _enteredName = '';
   var _enteredQuantity = 1;
   var _selectedCategory = categories[Categories.vegetables]!;
+  var _isSending = false;
 
   void _saveItem() async {
     _formKey.currentState!.validate();
     _formKey.currentState!.save();
+    setState(() {
+      _isSending = true;
+    });
     final url = Uri.https(
         'flutter-tcg-shopping-list-default-rtdb.firebaseio.com',
         'shopping-list.json');
@@ -148,14 +151,22 @@ class _NewItemScreenState extends State<NewItemScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
                   TextButton(
-                    onPressed: () {
-                      _formKey.currentState!.reset();
-                    },
+                    onPressed: _isSending
+                        ? null
+                        : () {
+                            _formKey.currentState!.reset();
+                          },
                     child: const Text('Reset'),
                   ),
                   ElevatedButton(
-                    onPressed: _saveItem,
-                    child: const Text('Add item'),
+                    onPressed: _isSending ? null : _saveItem,
+                    child: _isSending
+                        ? const SizedBox(
+                            height: 16,
+                            width: 16,
+                            child: CircularProgressIndicator(),
+                          )
+                        : const Text('Add item'),
                   ),
                 ],
               ),
